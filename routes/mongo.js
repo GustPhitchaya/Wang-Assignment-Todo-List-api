@@ -27,7 +27,7 @@ async function main() {
 }
 
 router.get('/', (req, res) => {
-  res.send(dogs[0]);
+  res.send(dogs);
 });
 
 module.exports = router;
