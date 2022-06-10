@@ -2,12 +2,18 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-let dogs;
-
 async function saveNewItem(item) {
-  const newDog = new Dog({ "name": item.name });
-  await newDog.save();
-  console.log(newDog.name + " is saved! huff huff!");
+  const newItem = new Item({ 
+    'description': item.description,
+    'due': item.due,
+    'isDone': item.isDone 
+  });
+  await newItem.save();
+  console.log('(' + newItem.description + ') is saved!');
+}
+
+async function getItems() {
+  return Item.find();
 }
 
 mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useUnifiedTopology: true })
@@ -19,21 +25,20 @@ mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useU
     console.log(err);
   })
 
-const dogSchema = new mongoose.Schema({
-  name: String,
-}, { collection: 'dogs' });
+const itemSchema = new mongoose.Schema({
+  description: String,
+  due: Date,
+  isDone: Boolean,
+}, { collection: 'items' });
 
-const Dog = new mongoose.model('Dog', dogSchema);
-dogs = Dog.aggregate([
-  { $project: { name: 1 } }
-]);
+const Item = new mongoose.model('Item', itemSchema);
 
 router.get('/', (req, res) => {
-  res.send(dogs);
+  res.send(getItems());
 });
 
 router.post('/', (req, res) => {
-  res.send(req.body.name);
+  res.send(req.body.description);
   saveNewItem(req.body)
 });
 
