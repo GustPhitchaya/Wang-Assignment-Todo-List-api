@@ -12,6 +12,29 @@ async function saveNewItem(item) {
   console.log('(' + newItem.description + ') is saved!');
 }
 
+async function updateItem(item) {
+  let oldItem = await Item.findOne( {_id: item._id} );
+  if (oldItem) {
+    oldItem.description = item.description;
+    oldItem.due = item.due;
+    oldItem.isDone = item.isDone;
+
+    await oldItem.save();
+    console.log('(' + item.description + ') is updated!');
+  } else {
+    console.log('the task is not found');
+  }
+}
+
+async function deleteItem(item) {
+  const result = await Item.deleteOne( {_id: item._id });
+  if (result.ok && result.deletedCount) {
+    console.log('(' + item.description + ') is deleted');
+  } else {
+    console.log('the task is not found, or an error occured');
+  }
+}
+
 let items, Item;
 
 // async function getItems() {
@@ -48,10 +71,20 @@ router.get('/', async (req, res) => {
   console.log('number of uncompleted items: ' + items.length);
 });
 
-router.post('/', (req, res) => {
-  res.send(req.body.description);
-  saveNewItem(req.body)
+router.post('/', async (req, res) => {
+  await saveNewItem(req.body)
+  res.send('saved new item: ' + req.body.description);
 });
+
+router.put('/', async (req, res) => {
+  await updateItem(req.body);
+  res.send('updated: ' + req.body.description);
+})
+
+router.delete('/', async (req, res) => {
+  await deleteItem(req.body);
+  res.send('deleted: ' + req.body.description);
+})
 
 setUpMongo();
 
