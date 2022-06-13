@@ -63,13 +63,19 @@ async function setUpMongo() {
     isDone: Boolean,
   }, { collection: 'items' });
 
-  itemSchema.index({ isDone: 1, due: -1 })
+  itemSchema.index({ isDone: 1, due: 1 })
 
   Item = new mongoose.model('Item', itemSchema);
 }
 
+router.get('/', async (req, res) => {
+  const allItems = await Item.find();
+  res.send(allItems);
+  console.log('number of all items: ' + allItems.length);
+})
+
 router.get('/uncompleted/', async (req, res) => {
-  const uncompletedItems = await Item.find({ isDone: false });
+  const uncompletedItems = await Item.find({ isDone: false }).sort('due');
   res.send(uncompletedItems);
   console.log('number of uncompleted items: ' + uncompletedItems.length);
 });
