@@ -13,7 +13,7 @@ async function saveNewItem(item) {
 }
 
 async function updateItem(item) {
-  let oldItem = await Item.findOne( {_id: item._id} );
+  let oldItem = await Item.findOne({ _id: item._id });
   if (oldItem) {
     oldItem.description = item.description;
     oldItem.due = item.due;
@@ -27,11 +27,13 @@ async function updateItem(item) {
 }
 
 async function deleteItem(item) {
-  const result = await Item.deleteOne( {_id: item._id });
-  if (result.ok && result.deletedCount) {
-    console.log('(' + item.description + ') is deleted');
-  } else {
-    console.log('the task is not found, or an error occured');
+  const result = await Item.deleteOne({ _id: item._id });
+  if (result) {
+    if (result.deletedCount) {
+      console.log('(' + item.description + ') is deleted');
+    } else {
+      console.log('the task is not found, or an error occured');
+    }
   }
 }
 
@@ -48,6 +50,8 @@ function setUpMongo() {
     due: Date,
     isDone: Boolean,
   }, { collection: 'items' });
+
+  itemSchema.index({isDone: 1, due: -1})
 
   Item = new mongoose.model('Item', itemSchema);
 }
@@ -68,7 +72,7 @@ router.get('/', async (req, res) => {
   await getItems().catch(err => console.log(err));
 
   res.send(items);
-  console.log('number of uncompleted items: ' + items.length);
+  console.log('number of all items: ' + items.length);
 });
 
 router.post('/', async (req, res) => {
