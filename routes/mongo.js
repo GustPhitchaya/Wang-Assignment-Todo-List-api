@@ -87,7 +87,7 @@ router.get('/completed/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  await saveNewItem(req.body)
+  await saveNewItem(req.body);
   res.send('saved new item: ' + req.body.title);
 });
 
